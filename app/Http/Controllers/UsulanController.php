@@ -200,7 +200,9 @@ class UsulanController extends Controller
     {
         $id = '13';
         
-        $query01 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY bidangIlmu DESC',['hb' => strval($id)]);
+        $query01 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb',['hb' => strval($id)]);
+
+        // $query01 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY id ASC',['hb' => strval($id)]);
 
         $reset = DB::statement('TRUNCATE TABLE helpans');
 
@@ -227,6 +229,7 @@ class UsulanController extends Controller
 
                 $simu_anp1 = Helpan::find($query01[$in]->id);
                 $simu_anp1->an_p1 = $que_score[$i]->nip;
+                $simu_anp1->sc_p1 = $que_score[$i]->totScore;
                 if ($cekJumlah[0]->anp1cek < $kuota && $fitMetPen > 0) {
                     $simu_anp1->update();
                     break;
@@ -241,12 +244,13 @@ class UsulanController extends Controller
             if (count($ceknull) > 0) {
                 for ($f = 0; $f < count($ceknull); $f++) {
                     $ceknull[$f]->an_p1 = $cekdis[0]->nip;
+                    $ceknull[$f]->sc_p1 = '0.0';
                     $ceknull[$f]->update();
                 }
             }    
 
         //p2    
-        $query02 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY bidangIlmu ASC',['hb' => strval($id)]);
+        $query02 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb',['hb' => strval($id)]);
        
         for ($in = 0; $in < count($query02); $in++) {
             $que_score = DB::select('SELECT filtereduser.id AS nip, nama, SUM(score*bobot) AS totScore, an_p1, an_p2, an_p3, an_p4 FROM (SELECT * FROM users WHERE role = :role) AS filtereduser LEFT JOIN jatahs ON filtereduser.id = jatahs.nip LEFT JOIN scorings ON filtereduser.id = scorings.nip LEFT JOIN criterias ON scorings.idCriteria = criterias.id AND (idVariabel = :bidangIlmu OR idVariabel = :hb OR idVariabel = :metPen) GROUP BY filtereduser.id ORDER BY totScore DESC',['role'=>'dosen', 'bidangIlmu' => $query02[$in]->bidangIlmu, 'hb'=>strval($id),'metPen'=>$query02[$in]->metPen]);
@@ -267,6 +271,7 @@ class UsulanController extends Controller
                     } else {
                         if ($cekJumlah[0]->anp2cek < $kuota && $fitMetPen > 0) {
                             $simu_anp1->an_p2 = $que_score[$i]->nip;
+                            $simu_anp1->sc_p2 = $que_score[$i]->totScore;
                             $simu_anp1->update();
                             break;
                         }   
@@ -280,13 +285,14 @@ class UsulanController extends Controller
                     if (count($ceknull) > 0) {
                         for ($f = 0; $f < count($ceknull); $f++) {
                             $ceknull[$f]->an_p2 = $cekdis[0]->nip;
+                            $ceknull[$f]->sc_p2 = '0.0';
                             $ceknull[$f]->update();
                         }
                     } 
         }
 
         //p3   
-        $query03 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY bidangIlmu DESC',['hb' => strval($id)]);
+        $query03 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb',['hb' => strval($id)]);
 
         for ($in = 0; $in < count($query03); $in++) {
             $que_score = DB::select('SELECT filtereduser.id AS nip, nama, SUM(score*bobot) AS totScore, an_p1, an_p2, an_p3, an_p4 FROM (SELECT * FROM users WHERE role = :role) AS filtereduser LEFT JOIN jatahs ON filtereduser.id = jatahs.nip LEFT JOIN scorings ON filtereduser.id = scorings.nip LEFT JOIN criterias ON scorings.idCriteria = criterias.id AND (idVariabel = :bidangIlmu OR idVariabel = :hb OR idVariabel = :metPen) GROUP BY filtereduser.id ORDER BY totScore DESC',['role'=>'dosen', 'bidangIlmu' => $query03[$in]->bidangIlmu, 'hb'=>strval($id),'metPen'=>$query03[$in]->metPen]);
@@ -307,6 +313,7 @@ class UsulanController extends Controller
                     } else {
                         if ($cekJumlah[0]->anp3cek < $kuota && $fitMetPen > 0) {
                             $simu_anp1->an_p3 = $que_score[$i]->nip;
+                            $simu_anp1->sc_p3 = $que_score[$i]->totScore;
                             $simu_anp1->update();
                             break;
                         }   
@@ -320,6 +327,7 @@ class UsulanController extends Controller
                     if (count($ceknull) > 0) {
                         for ($f = 0; $f < count($ceknull); $f++) {
                             $ceknull[$f]->an_p3 = $cekdis[0]->nip;
+                            $ceknull[$f]->sc_p3 = '0.0';
                             $ceknull[$f]->update();
                         }
                     } 
@@ -347,6 +355,7 @@ class UsulanController extends Controller
                     } else {
                         if ($cekJumlah[0]->anp4cek < $kuota && $fitMetPen > 0) {
                             $simu_anp1->an_p4 = $que_score[$i]->nip;
+                            $simu_anp1->sc_p4 = $que_score[$i]->totScore;
                             $simu_anp1->update();
                             break;
                         }   
@@ -360,13 +369,14 @@ class UsulanController extends Controller
                     if (count($ceknull) > 0) {
                         for ($f = 0; $f < count($ceknull); $f++) {
                             $ceknull[$f]->an_p4 = $cekdis[0]->nip;
+                            $ceknull[$f]->sc_p4 = '0.0';
                             $ceknull[$f]->update();
                         }
                     } 
         }
        $response['success'] = true;
        $response['message'] = "Usulan dengan id";
-       $response['data'] = DB::select('SELECT id, an_p1, an_p2, an_p3, an_p4, (SELECT nama FROM users WHERE id = an_p1) AS nama_p1, (SELECT nama FROM users WHERE id = an_p2) AS nama_p2, (SELECT nama FROM users WHERE id = an_p3) AS nama_p3, (SELECT nama FROM users WHERE id = an_p4) AS nama_p4 FROM helpans');
+       $response['data'] = DB::select('SELECT id, an_p1, an_p2, an_p3, an_p4, (SELECT nama FROM users WHERE id = an_p1) AS nama_p1, (SELECT nama FROM users WHERE id = an_p2) AS nama_p2, (SELECT nama FROM users WHERE id = an_p3) AS nama_p3, (SELECT nama FROM users WHERE id = an_p4) AS nama_p4, sc_p1, sc_p2, sc_p3, sc_p4 FROM helpans');
        return response()->json($response, 200);
     }
 
@@ -374,7 +384,7 @@ class UsulanController extends Controller
     {
         $id = '04';
         
-        $query01 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY bidangIlmu DESC',['hb' => strval($id)]);
+        $query01 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb',['hb' => strval($id)]);
 
         $reset = DB::statement('TRUNCATE TABLE helpabs');
 
@@ -401,6 +411,7 @@ class UsulanController extends Controller
 
                 $simu_ab = Helpab::find($query01[$in]->id);
                 $simu_ab->ab_p1 = $que_score[$i]->nip;
+                $simu_ab->sco_p1 = $que_score[$i]->totScore;
                 if ($cekJumlah[0]->abp1cek < $kuota && $fitMetPen > 0) {
                     $simu_ab->update();
                     break;
@@ -415,12 +426,13 @@ class UsulanController extends Controller
             if (count($ceknull) > 0) {
                 for ($f = 0; $f < count($ceknull); $f++) {
                     $ceknull[$f]->ab_p1 = $cekdis[0]->nip;
+                    $ceknull[$f]->sco_p1 = '0.0';
                     $ceknull[$f]->update();
                 }
             }    
 
         //p2    
-        $query02 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb ORDER BY bidangIlmu ASC',['hb' => strval($id)]);
+        $query02 = DB::select('SELECT id, nim, bidangIlmu, metPen FROM usulans WHERE SUBSTRING(nim,6,2) = :hb',['hb' => strval($id)]);
        
         for ($in = 0; $in < count($query02); $in++) {
             $que_score = DB::select('SELECT filtereduser.id AS nip, nama, SUM(score*bobot) AS totScore, ab_p1, ab_p2, ab_p3 FROM (SELECT * FROM users WHERE role = :role) AS filtereduser LEFT JOIN jatahs ON filtereduser.id = jatahs.nip LEFT JOIN scorings ON filtereduser.id = scorings.nip LEFT JOIN criterias ON scorings.idCriteria = criterias.id AND (idVariabel = :bidangIlmu OR idVariabel = :hb OR idVariabel = :metPen) GROUP BY filtereduser.id ORDER BY totScore DESC',['role'=>'dosen', 'bidangIlmu' => $query02[$in]->bidangIlmu, 'hb'=>strval($id),'metPen'=>$query02[$in]->metPen]);
@@ -441,6 +453,7 @@ class UsulanController extends Controller
                     } else {
                         if ($cekJumlah[0]->abp2cek < $kuota && $fitMetPen > 0) {
                             $simu_ab->ab_p2 = $que_score[$i]->nip;
+                            $simu_ab->sco_p2 = $que_score[$i]->totScore;
                             $simu_ab->update();
                             break;
                         }   
@@ -454,6 +467,7 @@ class UsulanController extends Controller
                     if (count($ceknull) > 0) {
                         for ($f = 0; $f < count($ceknull); $f++) {
                             $ceknull[$f]->ab_p2 = $cekdis[0]->nip;
+                            $ceknull[$f]->sco_p2 = '0.0';
                             $ceknull[$f]->update();
                         }
                     } 
@@ -481,6 +495,7 @@ class UsulanController extends Controller
                     } else {
                         if ($cekJumlah[0]->abp3cek < $kuota && $fitMetPen > 0) {
                             $simu_ab->ab_p3 = $que_score[$i]->nip;
+                            $simu_ab->sco_p3 = $que_score[$i]->totScore;
                             $simu_ab->update();
                             break;
                         }   
@@ -494,13 +509,14 @@ class UsulanController extends Controller
                     if (count($ceknull) > 0) {
                         for ($f = 0; $f < count($ceknull); $f++) {
                             $ceknull[$f]->ab_p3 = $cekdis[0]->nip;
+                            $ceknull[$f]->sco_p3 = '0.0';
                             $ceknull[$f]->update();
                         }
                     } 
         }
         $response['success'] = true;
         $response['message'] = "Usulan dengan id";
-        $response['data'] = DB::select('SELECT id, ab_p1, ab_p2, ab_p3, (SELECT nama FROM users WHERE id = ab_p1) AS nama_p1, (SELECT nama FROM users WHERE id = ab_p2) AS nama_p2, (SELECT nama FROM users WHERE id = ab_p3) AS nama_p3 FROM helpabs');
+        $response['data'] = DB::select('SELECT id, ab_p1, ab_p2, ab_p3, (SELECT nama FROM users WHERE id = ab_p1) AS nama_p1, (SELECT nama FROM users WHERE id = ab_p2) AS nama_p2, (SELECT nama FROM users WHERE id = ab_p3) AS nama_p3, sco_p1, sco_p2, sco_p3 FROM helpabs');
         return response()->json($response, 200);
     }
 
